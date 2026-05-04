@@ -10,7 +10,9 @@ export interface GitHubSearchResponse {
   total_count: number;
 }
 
-export async function searchIssues(query: string): Promise<GitHubSearchResponse> {
+export async function searchIssues(
+  query: string,
+): Promise<GitHubSearchResponse> {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": "hiero-website",
@@ -25,8 +27,16 @@ export async function searchIssues(query: string): Promise<GitHubSearchResponse>
     { headers },
   );
 
-  if (!res.ok) throw new Error("GitHub request failed");
-  return res.json();
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    const message =
+      typeof body?.message === "string"
+        ? body.message
+        : "GitHub request failed";
+    throw Object.assign(new Error(message), { status: res.status });
+  }
+
+  return (await res.json()) as GitHubSearchResponse;
 }
 
 export async function GET(req: Request) {
