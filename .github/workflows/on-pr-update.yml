@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   on-pr-update:
-    runs-on: hl-web-lin-md
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
 
     concurrency:
